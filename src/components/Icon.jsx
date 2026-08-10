@@ -1,0 +1,72 @@
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
+
+// Maps the design mockups' Tabler icon names (`ti ti-*`) to a bundled icon set.
+const MAP = {
+  check: ['ion', 'checkmark'],
+  'plane-departure': ['mci', 'airplane-takeoff'],
+  'plane-arrival': ['mci', 'airplane-landing'],
+  plane: ['ion', 'airplane-outline'],
+  download: ['ion', 'download-outline'],
+  'brand-whatsapp': ['mci', 'whatsapp'],
+  mail: ['ion', 'mail-outline'],
+  bed: ['mci', 'bed-outline'],
+  'chevron-right': ['ion', 'chevron-forward'],
+  'chevron-left': ['ion', 'chevron-back'],
+  'chevron-down': ['ion', 'chevron-down'],
+  history: ['ion', 'time-outline'],
+  wallet: ['ion', 'wallet-outline'],
+  qrcode: ['mci', 'qrcode'],
+  'building-bank': ['mci', 'bank-outline'],
+  'credit-card': ['ion', 'card-outline'],
+  lock: ['ion', 'lock-closed'],
+  briefcase: ['ion', 'briefcase-outline'],
+  'bag-checked': ['mci', 'bag-checked'],
+  'bag-cabin': ['mci', 'bag-personal-outline'],
+  'cash-banknote': ['mci', 'cash'],
+  receipt: ['ion', 'receipt-outline'],
+  users: ['ion', 'people-outline'],
+  'file-invoice': ['mci', 'file-document-outline'],
+  headset: ['ion', 'headset-outline'],
+  logout: ['ion', 'log-out-outline'],
+  pencil: ['ion', 'pencil'],
+  search: ['ion', 'search'],
+  filter: ['ion', 'filter'],
+  'arrow-right': ['ion', 'arrow-forward'],
+  'arrow-down': ['ion', 'arrow-down'],
+  clock: ['ion', 'time-outline'],
+  'clock-pause': ['mci', 'timer-pause-outline'],
+  'alert-circle': ['ion', 'alert-circle-outline'],
+  info: ['ion', 'information-circle-outline'],
+  'alert-triangle': ['ion', 'warning-outline'],
+  discount: ['mci', 'ticket-percent-outline'],
+  user: ['ion', 'person-outline'],
+  'user-circle': ['ion', 'person-circle-outline'],
+  eye: ['ion', 'eye-outline'],
+  'shield-check': ['ion', 'shield-checkmark-outline'],
+  armchair: ['mci', 'seat-outline'],
+  'layout-grid': ['ion', 'grid-outline'],
+  home: ['ion', 'home'],
+  'arrows-up-down': ['ion', 'swap-vertical'],
+  calendar: ['ion', 'calendar-outline'],
+  plus: ['ion', 'add'],
+  minus: ['ion', 'remove'],
+  x: ['ion', 'close'],
+  id: ['mci', 'card-account-details-outline'],
+  beach: ['mci', 'beach'],
+  dots: ['ion', 'ellipsis-horizontal'],
+  ticket: ['ion', 'ticket-outline'],
+  heart: ['ion', 'heart-outline'],
+  'arrow-left': ['ion', 'chevron-back'],
+  bell: ['ion', 'notifications-outline'],
+  route: ['mci', 'routes'],
+  globe: ['ion', 'globe-outline'],
+  menu: ['ion', 'menu-outline'],
+}
+
+export default function Icon({ name, size = 16, color = '#000', style }) {
+  const entry = MAP[name]
+  if (!entry) return null
+  const [set, glyph] = entry
+  const Cmp = set === 'mci' ? MaterialCommunityIcons : Ionicons
+  return <Cmp name={glyph} size={size} color={color} style={style} />
+}

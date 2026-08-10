@@ -1,0 +1,73 @@
+import { useEffect, useCallback, useState } from 'react'
+import { Stack } from 'expo-router'
+import './global.css'
+import { StatusBar } from 'expo-status-bar'
+import { View, Image, ActivityIndicator, StyleSheet } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+import * as SplashScreen from 'expo-splash-screen'
+import { useFonts, CormorantGaramond_600SemiBold, CormorantGaramond_700Bold } from '@expo-google-fonts/cormorant-garamond'
+import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter'
+import { restoreSession } from '../src/services/authService'
+import { colors, spacing } from '../src/theme/tokens'
+
+SplashScreen.preventAutoHideAsync()
+
+export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    CormorantGaramond_600SemiBold,
+    CormorantGaramond_700Bold,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+  })
+  const [sessionLoaded, setSessionLoaded] = useState(false)
+
+  useEffect(() => { restoreSession().finally(() => setSessionLoaded(true)) }, [])
+
+  const onLayoutReady = useCallback(async () => {
+    if (fontsLoaded && sessionLoaded) await SplashScreen.hideAsync()
+  }, [fontsLoaded, sessionLoaded])
+
+  useEffect(() => { onLayoutReady() }, [onLayoutReady])
+
+  // Covers the gap before fonts/session are ready with a real branded screen instead of a blank
+  // one — on native this sits behind the OS splash screen and is never actually seen, but on web
+  // (where expo-splash-screen's hide/show is a no-op) this is the only thing standing between the
+  // user and a blank white page.
+  if (!fontsLoaded || !sessionLoaded) {
+    return (
+      <View style={styles.boot}>
+        <Image source={require('../assets/logo.png')} style={styles.bootLogo} resizeMode="contain" />
+        <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.xl }} />
+      </View>
+    )
+  }
+
+  return (
+    <SafeAreaProvider>
+      <StatusBar style="dark" />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.cream } }}>
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="package/[id]" options={{ headerShown: true, title: 'Package' }} />
+        <Stack.Screen name="itinerary/[id]" options={{ headerShown: true, title: 'Your Itinerary' }} />
+        <Stack.Screen name="checkout/[id]" options={{ headerShown: true, title: 'Checkout' }} />
+        <Stack.Screen name="booking/[id]" options={{ headerShown: true, title: 'Booking Details' }} />
+        <Stack.Screen name="search" />
+        <Stack.Screen name="notifications" />
+        <Stack.Screen name="change-password" options={{ headerShown: true, title: 'Change Password' }} />
+        <Stack.Screen name="wallet/recharge" options={{ headerShown: true, title: 'Recharge Wallet' }} />
+        <Stack.Screen name="results" />
+        <Stack.Screen name="passenger/[id]" />
+        <Stack.Screen name="review/[id]" />
+        <Stack.Screen name="payment/[id]" />
+        <Stack.Screen name="confirmation/[id]" />
+      </Stack>
+    </SafeAreaProvider>
+  )
+}
+
+const styles = StyleSheet.create({
+  boot: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.cream },
+  bootLogo: { width: 200, height: 90 },
+})

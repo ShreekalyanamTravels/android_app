@@ -1,0 +1,6 @@
+/* React Native Web renders TextInput as a plain <input>, which picks up the
+   browser's default focus ring (shows as a black border on click/focus).
+   This is web-only — ignored on native platforms — so it's safe to keep global. */
+input, textarea, select {
+  outline: none !important;
+}
