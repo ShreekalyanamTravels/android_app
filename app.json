@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Kalyanam Travel",
-    "slug": "mobile-app",
+    "slug": "shrikalyanam",
     "scheme": "kalyanamtravel",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -31,9 +31,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "4f05cc5d-c725-4c01-a340-268b75313bec"
+        "projectId": "2f6e9246-5a38-441c-be94-88355e1c4bc7"
       }
     },
-    "owner": "shrikalyanam"
+    "owner": "shrikalyanams-team"
   }
 }
