@@ -27,6 +27,13 @@
       "expo-router",
       "expo-status-bar",
       "expo-splash-screen"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "4f05cc5d-c725-4c01-a340-268b75313bec"
+      }
+    },
+    "owner": "shrikalyanam"
   }
 }
