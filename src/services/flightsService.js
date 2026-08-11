@@ -59,3 +59,52 @@ export async function listAirports() {
 export async function listSavedTravellers() {
   return Promise.resolve(SAVED_TRAVELLERS)
 }
+
+export function extractAirportCode(label) {
+  const m = /\(([^)]+)\)/.exec(label || '')
+  return m ? m[1] : (label || '')
+}
+
+// dep is 'HH:MM'; overflow past midnight (dep-minutes + duration >= 24h) means the arrival lands
+// on a later calendar day than departure.
+export function arrivalDayOffset(dep, durMin) {
+  const [h, m] = (dep || '0:0').split(':').map(Number)
+  return Math.floor(((h * 60 + m) + (durMin || 0)) / 1440)
+}
+
+// Converts a raw /flights/search result (optionally with one of its fareOptions selected via the
+// fare sheet) into the flight shape the rest of the booking flow — passenger/review/confirmation
+// screens — already expects, so those screens don't need to change for the real API's field names.
+// Shared between app/results.jsx (domestic + multi-city) and app/results-international.jsx —
+// keeping one implementation avoids the two screens' booking payloads silently drifting apart.
+export function normalizeFlight(raw, fareOption) {
+  const fare = fareOption || raw.fareOptions?.[0] || {}
+  const stopCount = raw.stops || 0
+  const layoverCode = stopCount > 0 ? extractAirportCode(raw.segments?.[0]?.to) : ''
+  const dayOffset = arrivalDayOffset(raw.dep, raw.durMin)
+  return {
+    rawId: raw.id,
+    id: fare.yatraId || raw.yatraId,
+    yatraId: fare.yatraId || raw.yatraId,
+    scid: raw.scid,
+    supplierCode: fare.supplierCode || raw.supplierCode,
+    airline: raw.airline,
+    airCode: raw.airCode,
+    color: raw.color,
+    flightNo: (raw.segments || []).map(s => s.code).join(' / '),
+    dep: raw.dep,
+    arr: raw.arr,
+    arrNote: dayOffset > 0 ? `+${dayOffset} day${dayOffset > 1 ? 's' : ''}` : '',
+    duration: raw.dur,
+    stops: stopCount === 0 ? 'Non-stop' : `${stopCount} stop${stopCount > 1 ? 's' : ''}${layoverCode ? ` · ${layoverCode}` : ''}`,
+    fareType: fare.fareId || raw.fareId,
+    price: fare.price ?? raw.price,
+    refundable: fare.refundable ?? raw.refundable,
+    cabinBaggage: fare.cabinBag || '',
+    checkinBaggage: fare.checkIn || '',
+    // Passthrough only — not read by the booking payload, just carried along so a screen that
+    // already has the selected flight (e.g. a post-selection summary card) can render per-segment
+    // detail without needing to separately track the raw search-result item.
+    segments: raw.segments || [],
+  }
+}

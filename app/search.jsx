@@ -179,8 +179,9 @@ export default function Search() {
       })
       return
     }
+    const isInternational = (AIRPORTS[route.from]?.country || 'IN') !== 'IN' || (AIRPORTS[route.to]?.country || 'IN') !== 'IN'
     router.push({
-      pathname: '/results',
+      pathname: isInternational ? '/results-international' : '/results',
       params: {
         tripType,
         from: route.from,

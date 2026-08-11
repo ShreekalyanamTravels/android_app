@@ -58,6 +58,7 @@ export default function RootLayout() {
         <Stack.Screen name="change-password" options={{ headerShown: true, title: 'Change Password' }} />
         <Stack.Screen name="wallet/recharge" options={{ headerShown: true, title: 'Recharge Wallet' }} />
         <Stack.Screen name="results" />
+        <Stack.Screen name="results-international" />
         <Stack.Screen name="passenger/[id]" />
         <Stack.Screen name="review/[id]" />
         <Stack.Screen name="payment/[id]" />
