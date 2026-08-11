@@ -9,7 +9,8 @@
     "userInterfaceStyle": "light",
     "backgroundColor": "#faf8f4",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.shreekalyanam.travel"
     },
     "android": {
       "package": "com.shreekalyanam.travel",
