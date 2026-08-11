@@ -161,7 +161,7 @@ export default function InsuranceSearch() {
       onSelect: v => {
         setInsType(v)
         setError('')
-        if (v === 'Individual') {
+        if (v === 'Individual' || v === 'Annual Multitrip') {
           setPersons(1)
           setTravellers([{ relationship: 'Self', dob: '' }])
         } else if (v === 'Family Floater') {
@@ -190,7 +190,7 @@ export default function InsuranceSearch() {
     if (!startDate) return setError('Please select the start date.')
     if (!endDate) return setError('Please select the end date.')
     if (parseIso(endDate.iso) < parseIso(startDate.iso)) return setError('End date must be on or after the start date.')
-    if (insType === 'Individual' && !travellers[0]?.dob) return setError('Please enter the traveller\'s date of birth.')
+    if ((insType === 'Individual' || insType === 'Annual Multitrip') && !travellers[0]?.dob) return setError('Please enter the traveller\'s date of birth.')
     if (insType === 'Family Floater') {
       if (travellers.some(t => !t.dob)) return setError('Please enter date of birth for all travellers.')
       if (travellers.slice(1).some(t => !t.relationship)) return setError('Please select relationship for all additional travellers.')
