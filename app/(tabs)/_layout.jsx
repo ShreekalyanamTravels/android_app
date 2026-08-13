@@ -1,8 +1,10 @@
+import { useEffect } from 'react'
 import { Tabs } from 'expo-router'
 import { View, Text, Pressable, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Icon from '../../src/components/Icon'
 import { colors, fonts, radius, spacing } from '../../src/theme/tokens'
+import { registerForPushNotifications, subscribeToPushTokenChanges } from '../../src/services/pushService'
 
 const NAV_ITEMS = [
   { key: 'bookings', label: 'Bookings', icon: 'briefcase', route: 'bookings' },
@@ -41,6 +43,12 @@ function CustomTabBar({ state, navigation }) {
 }
 
 export default function TabsLayout() {
+  useEffect(() => {
+    registerForPushNotifications()
+    const sub = subscribeToPushTokenChanges()
+    return () => sub.remove()
+  }, [])
+
   return (
     <Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
       <Tabs.Screen name="home" />

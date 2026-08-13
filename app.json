@@ -38,7 +38,8 @@
             "backgroundColor": "#faf8f4"
           }
         }
-      ]
+      ],
+      "expo-notifications"
     ],
     "extra": {
       "router": {},
