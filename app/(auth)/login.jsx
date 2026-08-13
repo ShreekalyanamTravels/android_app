@@ -4,10 +4,12 @@ import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Icon from '../../src/components/Icon'
 import Toast from '../../src/components/Toast'
-import { login } from '../../src/services/authService'
+import { login, sendLoginOtp, verifyLoginOtp } from '../../src/services/authService'
 import { colors, spacing, radius, fonts } from '../../src/theme/tokens'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const MOBILE_RE = /^[6-9]\d{9}$/
+const OTP_RE = /^\d{6}$/
 
 function validate(email, password) {
   const errors = {}
@@ -19,6 +21,7 @@ function validate(email, password) {
 
 export default function Login() {
   const router = useRouter()
+  const [loginMethod, setLoginMethod] = useState('email') // 'email' | 'mobile'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -27,8 +30,58 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState(null) // { id, message }
 
+  const [mobile, setMobile] = useState('')
+  const [otp, setOtp] = useState('')
+  const [otpSent, setOtpSent] = useState(false)
+  const [sendingOtp, setSendingOtp] = useState(false)
+  const [verifyingOtp, setVerifyingOtp] = useState(false)
+
   function showToast(message) {
     setToast({ id: Date.now(), message })
+  }
+
+  function switchMethod(method) {
+    setLoginMethod(method)
+    setFieldErrors({})
+  }
+
+  function changeNumber() {
+    setOtpSent(false)
+    setOtp('')
+  }
+
+  async function sendOtp() {
+    if (sendingOtp) return
+    if (!MOBILE_RE.test(mobile.trim())) {
+      showToast('Enter a valid 10-digit mobile number')
+      return
+    }
+    setSendingOtp(true)
+    try {
+      await sendLoginOtp(mobile.trim())
+      setOtpSent(true)
+    } catch (e) {
+      showToast(e.message || 'Unable to send OTP')
+    } finally {
+      setSendingOtp(false)
+    }
+  }
+
+  async function verifyOtp() {
+    if (verifyingOtp) return
+    if (!OTP_RE.test(otp.trim())) {
+      showToast('Enter the 6-digit OTP')
+      return
+    }
+    setVerifyingOtp(true)
+    try {
+      await verifyLoginOtp(mobile.trim(), otp.trim())
+      router.replace('/(tabs)/home')
+    } catch (e) {
+      showToast(e.message || 'Unable to verify OTP')
+    } finally {
+      setVerifyingOtp(false)
+    }
   }
 
   function updateEmail(value) {
@@ -95,57 +148,122 @@ export default function Login() {
           <Text style={styles.title}>Corporate login</Text>
           <Text style={styles.subtitle}>Access your corporate travel dashboard</Text>
 
-          <View style={[styles.field, fieldErrors.email && styles.fieldError]}>
-            <Icon name="user" size={17} color={colors.primary} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.fieldLabel}>EMAIL ID</Text>
-              <TextInput
-                value={email}
-                onChangeText={updateEmail}
-                style={styles.fieldInput}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                placeholderTextColor={colors.textMuted}
-              />
-            </View>
-          </View>
-          {fieldErrors.email ? <Text style={styles.fieldErrorText}>{fieldErrors.email}</Text> : null}
-
-          <View style={[styles.field, fieldErrors.password && styles.fieldError]}>
-            <Icon name="lock" size={17} color={colors.primary} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.fieldLabel}>PASSWORD</Text>
-              <TextInput
-                value={password}
-                onChangeText={updatePassword}
-                secureTextEntry={!showPassword}
-                style={[styles.fieldInput, { letterSpacing: showPassword ? 0 : 2 }]}
-                placeholderTextColor={colors.textMuted}
-              />
-            </View>
-            <Pressable onPress={() => setShowPassword(v => !v)} hitSlop={8}>
-              <Icon name="eye" size={16} color={colors.textFaint} />
+          <View style={styles.methodToggle}>
+            <Pressable style={[styles.methodPill, loginMethod === 'email' && styles.methodPillActive]} onPress={() => switchMethod('email')}>
+              <Text style={[styles.methodPillText, loginMethod === 'email' && styles.methodPillTextActive]}>Email</Text>
+            </Pressable>
+            <Pressable style={[styles.methodPill, loginMethod === 'mobile' && styles.methodPillActive]} onPress={() => switchMethod('mobile')}>
+              <Text style={[styles.methodPillText, loginMethod === 'mobile' && styles.methodPillTextActive]}>Mobile</Text>
             </Pressable>
           </View>
-          {fieldErrors.password ? <Text style={styles.fieldErrorText}>{fieldErrors.password}</Text> : null}
 
-          <View style={styles.rowBetween}>
-            <Pressable style={styles.rememberRow} onPress={() => setRemember(v => !v)}>
-              <View style={[styles.checkbox, remember && styles.checkboxChecked]}>
-                {remember && <Icon name="check" size={10} color={colors.onDark} />}
+          {loginMethod === 'email' ? (
+            <>
+              <View style={[styles.field, fieldErrors.email && styles.fieldError]}>
+                <Icon name="user" size={17} color={colors.primary} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.fieldLabel}>EMAIL ID</Text>
+                  <TextInput
+                    value={email}
+                    onChangeText={updateEmail}
+                    style={styles.fieldInput}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    placeholderTextColor={colors.textMuted}
+                  />
+                </View>
               </View>
-              <Text style={styles.rememberText}>Remember me</Text>
-            </Pressable>
-            <Pressable onPress={() => router.push('/(auth)/forgot-password')} hitSlop={6}>
-              <Text style={styles.forgotText}>Forgot password?</Text>
-            </Pressable>
-          </View>
+              {fieldErrors.email ? <Text style={styles.fieldErrorText}>{fieldErrors.email}</Text> : null}
 
-          <Pressable style={[styles.signInBtn, loading && styles.signInBtnDisabled]} onPress={signIn} disabled={loading}>
-            {loading && <ActivityIndicator size="small" color={colors.onDark} />}
-            <Text style={styles.signInText}>{loading ? 'Signing in…' : 'Sign in'}</Text>
-            {!loading && <Icon name="arrow-right" size={13} color={colors.onDark} />}
-          </Pressable>
+              <View style={[styles.field, fieldErrors.password && styles.fieldError]}>
+                <Icon name="lock" size={17} color={colors.primary} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.fieldLabel}>PASSWORD</Text>
+                  <TextInput
+                    value={password}
+                    onChangeText={updatePassword}
+                    secureTextEntry={!showPassword}
+                    style={[styles.fieldInput, { letterSpacing: showPassword ? 0 : 2 }]}
+                    placeholderTextColor={colors.textMuted}
+                  />
+                </View>
+                <Pressable onPress={() => setShowPassword(v => !v)} hitSlop={8}>
+                  <Icon name="eye" size={16} color={colors.textFaint} />
+                </Pressable>
+              </View>
+              {fieldErrors.password ? <Text style={styles.fieldErrorText}>{fieldErrors.password}</Text> : null}
+
+              <View style={styles.rowBetween}>
+                <Pressable style={styles.rememberRow} onPress={() => setRemember(v => !v)}>
+                  <View style={[styles.checkbox, remember && styles.checkboxChecked]}>
+                    {remember && <Icon name="check" size={10} color={colors.onDark} />}
+                  </View>
+                  <Text style={styles.rememberText}>Remember me</Text>
+                </Pressable>
+                <Pressable onPress={() => router.push('/(auth)/forgot-password')} hitSlop={6}>
+                  <Text style={styles.forgotText}>Forgot password?</Text>
+                </Pressable>
+              </View>
+
+              <Pressable style={[styles.signInBtn, loading && styles.signInBtnDisabled]} onPress={signIn} disabled={loading}>
+                {loading && <ActivityIndicator size="small" color={colors.onDark} />}
+                <Text style={styles.signInText}>{loading ? 'Signing in…' : 'Sign in'}</Text>
+                {!loading && <Icon name="arrow-right" size={13} color={colors.onDark} />}
+              </Pressable>
+            </>
+          ) : (
+            <>
+              <View style={styles.field}>
+                <Icon name="user" size={17} color={colors.primary} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.fieldLabel}>MOBILE NUMBER</Text>
+                  <TextInput
+                    value={mobile}
+                    onChangeText={setMobile}
+                    style={styles.fieldInput}
+                    keyboardType="phone-pad"
+                    maxLength={10}
+                    editable={!otpSent}
+                    placeholderTextColor={colors.textMuted}
+                  />
+                </View>
+                {otpSent && (
+                  <Pressable onPress={changeNumber} hitSlop={6}>
+                    <Text style={styles.changeNumberText}>Change Number</Text>
+                  </Pressable>
+                )}
+              </View>
+
+              {otpSent && (
+                <View style={styles.field}>
+                  <Icon name="lock" size={17} color={colors.primary} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.fieldLabel}>ENTER OTP</Text>
+                    <TextInput
+                      value={otp}
+                      onChangeText={setOtp}
+                      style={styles.fieldInput}
+                      keyboardType="number-pad"
+                      maxLength={6}
+                      placeholderTextColor={colors.textMuted}
+                    />
+                  </View>
+                </View>
+              )}
+
+              <Pressable
+                style={[styles.signInBtn, (sendingOtp || verifyingOtp) && styles.signInBtnDisabled, { marginTop: 6 }]}
+                onPress={otpSent ? verifyOtp : sendOtp}
+                disabled={sendingOtp || verifyingOtp}
+              >
+                {(sendingOtp || verifyingOtp) && <ActivityIndicator size="small" color={colors.onDark} />}
+                <Text style={styles.signInText}>
+                  {otpSent ? (verifyingOtp ? 'Verifying…' : 'Verify & Sign In') : (sendingOtp ? 'Sending OTP…' : 'Send OTP')}
+                </Text>
+                {!sendingOtp && !verifyingOtp && <Icon name="arrow-right" size={13} color={colors.onDark} />}
+              </Pressable>
+            </>
+          )}
 
           <Text style={styles.footerNote}>
             <Icon name="lock" size={11} color={colors.textFaint} />  Secured access for authorised corporate accounts
@@ -177,6 +295,13 @@ const styles = StyleSheet.create({
   tagline: { textAlign: 'center', marginTop: 2, fontFamily: fonts.heading, fontSize: 11, fontStyle: 'italic', color: colors.accent },
   title: { textAlign: 'center', marginTop: 16, fontSize: 16, fontWeight: '500', color: colors.textDark },
   subtitle: { textAlign: 'center', marginTop: 2, marginBottom: 16, fontSize: 12, color: colors.textMuted },
+
+  methodToggle: { flexDirection: 'row', backgroundColor: colors.creamAlt, borderRadius: radius.pill, padding: 3, marginBottom: 16 },
+  methodPill: { flex: 1, alignItems: 'center', paddingVertical: 9, borderRadius: radius.pill },
+  methodPillActive: { backgroundColor: colors.primary },
+  methodPillText: { fontSize: 13, fontWeight: '600', color: colors.textMuted },
+  methodPillTextActive: { color: colors.onDark },
+  changeNumberText: { fontSize: 11, fontWeight: '600', color: colors.primary },
 
   field: {
     flexDirection: 'row', alignItems: 'center', gap: 10,

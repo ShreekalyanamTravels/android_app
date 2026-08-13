@@ -36,6 +36,17 @@ export function getCurrentUser() {
   return session?.user ?? null
 }
 
+function applySession(data) {
+  session = {
+    accessToken: data.accessToken,
+    refreshToken: data.refreshToken,
+    expiresIn: data.expiresIn,
+    user: data.user,
+  }
+  persist()
+  return session.user
+}
+
 export async function login(email, password) {
   const data = await apiFetch('/auth/login', {
     method: 'POST',
@@ -47,14 +58,31 @@ export async function login(email, password) {
     throw new Error('You are not active, please contact admin')
   }
 
-  session = {
-    accessToken: data.accessToken,
-    refreshToken: data.refreshToken,
-    expiresIn: data.expiresIn,
-    user: data.user,
+  return applySession(data)
+}
+
+// OTP login — mobile number + 6-digit SMS code, bearer-token counterpart of the web app's
+// cookie-session /api/auth/login/mobile/* flow (see frontend/app/api/v1/auth/login/mobile/*).
+export async function sendLoginOtp(mobile) {
+  return apiFetch('/auth/login/mobile/send-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mobile }),
+  })
+}
+
+export async function verifyLoginOtp(mobile, otp) {
+  const data = await apiFetch('/auth/login/mobile/verify-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mobile, otp }),
+  })
+
+  if (data.user?.status !== 'Active') {
+    throw new Error('You are not active, please contact admin')
   }
-  persist()
-  return session.user
+
+  return applySession(data)
 }
 
 export async function forgotPassword(email) {
