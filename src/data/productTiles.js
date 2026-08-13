@@ -13,13 +13,10 @@ export const PRODUCT_TILES = {
   visa: { key: 'visa', label: 'Visa', icon: 'id', bg: colors.pinkBg, color: colors.primary },
 }
 
-// Optimistic seed used until GET /products resolves — assumes everything's active (matching the
-// web app's own default state), so tiles don't flash in and out of existence on first load; they
-// just narrow down once the real status is known.
-export const DEFAULT_PRODUCTS = [
-  { name: 'Flight', status: 'active', availability: 'live' },
-  { name: 'Insurance', status: 'active', availability: 'live' },
-  { name: 'Hotels', status: 'active', availability: 'coming_soon' },
-  { name: 'Travel', status: 'active', availability: 'coming_soon' },
-  { name: 'Visa', status: 'active', availability: 'coming_soon' },
-]
+// Starting state used until GET /products resolves — deliberately empty rather than guessing
+// "everything's active": an optimistic guess was tried before, but real product status drifts
+// (e.g. Hotels/Travel/Visa are currently inactive) and any tile that guessed wrong would flash
+// in on mount and then instantly vanish once the real, different status arrived. An empty list
+// just shows nothing for the brief moment before the real (fast) fetch resolves, then fills in
+// once — no incorrect flash either way.
+export const DEFAULT_PRODUCTS = []

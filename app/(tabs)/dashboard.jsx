@@ -340,8 +340,9 @@ export default function Dashboard() {
           </View>
         </View>
 
-        {/* Monthly Hotel Booking — hidden entirely while the Hotels product is inactive */}
-        {hotelsProduct.status === 'active' && (
+        {/* Monthly Hotel Booking — hidden entirely while the Hotels product is inactive (or not
+            yet known, since hotelsProduct starts undefined until GET /products resolves) */}
+        {hotelsProduct?.status === 'active' && (
           <>
             <View style={styles.sectionHeaderRow}>
               <Text style={styles.sectionTitle}>Monthly Hotel Booking</Text>
