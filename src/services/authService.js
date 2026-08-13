@@ -1,5 +1,18 @@
+import { Platform } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as Application from 'expo-application'
 import { apiFetch } from './apiClient'
+
+// Real OS-level device identifier — Android's Settings.Secure.ANDROID_ID, or iOS's
+// identifierForVendor. Sent on login so the backend can record it on users.device_id. No
+// equivalent exists on web, so this resolves to null there (and login proceeds without one).
+async function getDeviceId() {
+  try {
+    if (Platform.OS === 'android') return Application.getAndroidId()
+    if (Platform.OS === 'ios') return await Application.getIosIdForVendorAsync()
+  } catch {}
+  return null
+}
 
 const STORAGE_KEY = 'auth_session'
 
@@ -48,10 +61,11 @@ function applySession(data) {
 }
 
 export async function login(email, password) {
+  const deviceId = await getDeviceId()
   const data = await apiFetch('/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, deviceId: deviceId || undefined }),
   })
 
   if (data.user?.status !== 'Active') {
@@ -72,10 +86,11 @@ export async function sendLoginOtp(mobile) {
 }
 
 export async function verifyLoginOtp(mobile, otp) {
+  const deviceId = await getDeviceId()
   const data = await apiFetch('/auth/login/mobile/verify-otp', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ mobile, otp }),
+    body: JSON.stringify({ mobile, otp, deviceId: deviceId || undefined }),
   })
 
   if (data.user?.status !== 'Active') {
