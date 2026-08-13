@@ -24,8 +24,18 @@ export default function RootLayout() {
 
   useEffect(() => { restoreSession().finally(() => setSessionLoaded(true)) }, [])
 
-  const onLayoutReady = useCallback(async () => {
-    if (fontsLoaded && sessionLoaded) await SplashScreen.hideAsync()
+  const onLayoutReady = useCallback(() => {
+    if (!fontsLoaded || !sessionLoaded) return
+    // hideAsync() fires in the same tick React swaps from the boot view to the real <Stack>
+    // (which still has to navigate the initial Redirect and paint Home/Login) — calling it
+    // immediately can hide the native splash a frame or two before that's actually on screen,
+    // showing a blank flash in between. Two nested rAFs guarantee at least one full commit+paint
+    // cycle has happened first, so the splash only comes down once there's real content behind it.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        SplashScreen.hideAsync()
+      })
+    })
   }, [fontsLoaded, sessionLoaded])
 
   useEffect(() => { onLayoutReady() }, [onLayoutReady])
