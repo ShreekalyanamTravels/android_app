@@ -1,5 +1,5 @@
 // Production backend.
-export const API_BASE = 'https://shreekalyanamtravels.com/api/v1'
+export const API_BASE = 'https://corporate.shreekalyanam.com/api/v1'
 
 // Same host, no /api/v1 — for static assets served from the backend's /public folder
 // (e.g. /airline_icons/{code}.png), which don't live under the API path.
