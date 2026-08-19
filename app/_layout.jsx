@@ -5,12 +5,15 @@ import { StatusBar } from 'expo-status-bar'
 import { View, ActivityIndicator, StyleSheet } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import * as SplashScreen from 'expo-splash-screen'
+import Constants from 'expo-constants'
 import { useFonts, CormorantGaramond_600SemiBold, CormorantGaramond_700Bold } from '@expo-google-fonts/cormorant-garamond'
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter'
 import { restoreSession } from '../src/services/authService'
 import { colors, spacing } from '../src/theme/tokens'
-import { ConfigProvider, useAppConfig } from '../src/context/ConfigContext'
+import { ConfigProvider, useAppConfig, useRefreshConfig } from '../src/context/ConfigContext'
 import BrandLogo from '../src/components/BrandLogo'
+import GateScreen from '../src/components/GateScreen'
+import { isVersionBelow } from '../src/utils/version'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -24,6 +27,7 @@ export default function RootLayout() {
 
 function AppShell() {
   const config = useAppConfig()
+  const refreshConfig = useRefreshConfig()
   const [fontsLoaded] = useFonts({
     CormorantGaramond_600SemiBold,
     CormorantGaramond_700Bold,
@@ -61,6 +65,31 @@ function AppShell() {
         <BrandLogo uri={config.branding.loadingLogoUrl} style={styles.bootLogo} />
         <ActivityIndicator color={config.branding.primaryColor || colors.primary} style={{ marginTop: spacing.xl }} />
       </View>
+    )
+  }
+
+  if (config.maintenanceMode) {
+    return (
+      <GateScreen
+        icon="alert-triangle"
+        title="Under Maintenance"
+        message="We're making some improvements. Please check back shortly."
+        config={config}
+        onRetry={refreshConfig}
+      />
+    )
+  }
+
+  const currentVersion = Constants.expoConfig?.version
+  if (config.forceUpdate || isVersionBelow(currentVersion, config.minSupportedVersion)) {
+    return (
+      <GateScreen
+        icon="download"
+        title="Update Required"
+        message="A new version of the app is available. Please update to continue."
+        config={config}
+        onRetry={refreshConfig}
+      />
     )
   }
 

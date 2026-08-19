@@ -6,6 +6,7 @@ import Icon from '../../src/components/Icon'
 import { colors, spacing, radius, fonts } from '../../src/theme/tokens'
 import { getWalletBalance } from '../../src/services/walletService'
 import { purchaseInsurance, createInsuranceRazorpayOrder, verifyInsuranceRazorpayPayment } from '../../src/services/insuranceApi'
+import { useAppConfig } from '../../src/context/ConfigContext'
 
 const METHODS = [
   { id: 'creditpool', label: 'Credit Pool', icon: 'wallet', iconBg: colors.pinkBg, iconColor: colors.primary },
@@ -39,6 +40,7 @@ function safeParse(json, fallback) {
 
 export default function InsurancePayment() {
   const router = useRouter()
+  const appConfig = useAppConfig()
   const params = useLocalSearchParams()
   const { name, provider, coverage, premium, persons, dest, start, end, type } = params
   const premiumNum = Number(premium) || 0
@@ -129,7 +131,7 @@ export default function InsurancePayment() {
           key: order.keyId,
           amount: Math.round(order.amount * 100),
           currency: 'INR',
-          name: 'Shree Kalyanam',
+          name: appConfig.appName || 'Shree Kalyanam',
           description: 'Travel Insurance Premium',
           order_id: order.orderId,
           prefill: { email: proposer?.email, contact: proposer?.mobile },

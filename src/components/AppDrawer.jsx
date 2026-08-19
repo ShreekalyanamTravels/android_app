@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import Icon from './Icon'
 import { getCurrentUser, logout } from '../services/authService'
 import { colors, spacing, radius, fonts } from '../theme/tokens'
+import { useAppConfig } from '../context/ConfigContext'
 
 const DRAWER_WIDTH = Math.min(300, Dimensions.get('window').width * 0.82)
 
@@ -28,7 +29,9 @@ function initials(name) {
 
 export default function AppDrawer({ visible, onClose }) {
   const router = useRouter()
+  const config = useAppConfig()
   const pathname = usePathname()
+  const navItems = NAV_ITEMS.filter(item => item.key !== 'wallet' || config.featureFlags.walletRecharge)
   const [mounted, setMounted] = useState(visible)
   const translateX = useRef(new Animated.Value(-DRAWER_WIDTH)).current
   const user = getCurrentUser()
@@ -74,7 +77,7 @@ export default function AppDrawer({ visible, onClose }) {
             <View style={styles.divider} />
 
             <View style={{ flex: 1, paddingTop: spacing.sm }}>
-              {NAV_ITEMS.map(item => {
+              {navItems.map(item => {
                 const active = pathname === item.route.replace('/(tabs)', '')
                 return (
                   <Pressable key={item.key} style={[styles.item, active && styles.itemActive]} onPress={() => go(item.route)}>

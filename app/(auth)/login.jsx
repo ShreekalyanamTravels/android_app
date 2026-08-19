@@ -151,16 +151,18 @@ export default function Login() {
           <Text style={styles.title}>Corporate login</Text>
           <Text style={styles.subtitle}>Access your corporate travel dashboard</Text>
 
-          <View style={styles.methodToggle}>
-            <Pressable style={[styles.methodPill, loginMethod === 'email' && styles.methodPillActive]} onPress={() => switchMethod('email')}>
-              <Text style={[styles.methodPillText, loginMethod === 'email' && styles.methodPillTextActive]}>Email</Text>
-            </Pressable>
-            <Pressable style={[styles.methodPill, loginMethod === 'mobile' && styles.methodPillActive]} onPress={() => switchMethod('mobile')}>
-              <Text style={[styles.methodPillText, loginMethod === 'mobile' && styles.methodPillTextActive]}>Mobile</Text>
-            </Pressable>
-          </View>
+          {config.featureFlags.otpLogin && (
+            <View style={styles.methodToggle}>
+              <Pressable style={[styles.methodPill, loginMethod === 'email' && styles.methodPillActive]} onPress={() => switchMethod('email')}>
+                <Text style={[styles.methodPillText, loginMethod === 'email' && styles.methodPillTextActive]}>Email</Text>
+              </Pressable>
+              <Pressable style={[styles.methodPill, loginMethod === 'mobile' && styles.methodPillActive]} onPress={() => switchMethod('mobile')}>
+                <Text style={[styles.methodPillText, loginMethod === 'mobile' && styles.methodPillTextActive]}>Mobile</Text>
+              </Pressable>
+            </View>
+          )}
 
-          {loginMethod === 'email' ? (
+          {loginMethod === 'email' || !config.featureFlags.otpLogin ? (
             <>
               <View style={[styles.field, fieldErrors.email && styles.fieldError]}>
                 <Icon name="user" size={17} color={colors.primary} />

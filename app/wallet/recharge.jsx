@@ -9,6 +9,7 @@ import {
   getConvenienceFee, getGstPercentage, createRechargeOrder, verifyRechargePayment,
 } from '../../src/services/walletService'
 import { colors, spacing, radius, fonts } from '../../src/theme/tokens'
+import { useAppConfig } from '../../src/context/ConfigContext'
 
 const ACCENT = colors.accent // matches the web recharge page's orange theme
 
@@ -42,6 +43,7 @@ function loadRazorpayScript() {
 
 export default function RechargeWallet() {
   const router = useRouter()
+  const config = useAppConfig()
   const user = getCurrentUser()
   const [amount, setAmount] = useState('')
   const [method, setMethod] = useState('upi')
@@ -83,7 +85,7 @@ export default function RechargeWallet() {
           key: order.keyId,
           amount: Math.round(order.total * 100),
           currency: 'INR',
-          name: 'Shree Kalyanam',
+          name: config.appName || 'Shree Kalyanam',
           description: 'Wallet Top-up',
           order_id: order.orderId,
           prefill: { name: user?.name, email: user?.email },
@@ -121,6 +123,18 @@ export default function RechargeWallet() {
       setError(e.message || 'Something went wrong. Please try again.')
       setPayStatus('idle')
     }
+  }
+
+  if (config.featureFlags.walletRecharge === false) {
+    return (
+      <View style={[styles.container, { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xl }]}>
+        <ThemedText variant="h3" style={{ textAlign: 'center' }}>Wallet Recharge Unavailable</ThemedText>
+        <ThemedText variant="muted" style={{ textAlign: 'center', marginTop: spacing.sm }}>
+          Online wallet recharge is temporarily disabled. Please try again later.
+        </ThemedText>
+        <Button label="Back to Profile" onPress={() => router.back()} style={{ marginTop: spacing.lg }} />
+      </View>
+    )
   }
 
   return (

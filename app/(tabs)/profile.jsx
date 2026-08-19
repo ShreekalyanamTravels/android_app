@@ -15,6 +15,7 @@ import { logout } from '../../src/services/authService'
 import { getWalletBalance } from '../../src/services/walletService'
 import { usePullToRefresh } from '../../src/hooks/usePullToRefresh'
 import { colors, spacing, radius } from '../../src/theme/tokens'
+import { useAppConfig } from '../../src/context/ConfigContext'
 
 const fmt = n => `₹ ${Math.abs(n).toLocaleString('en-IN')}`
 
@@ -29,6 +30,7 @@ const COMPANY_FIELDS = [
 
 export default function Profile() {
   const router = useRouter()
+  const config = useAppConfig()
   const [profile, setProfile] = useState(null)
   const [error, setError] = useState('')
   const [wallet, setWallet] = useState(null)
@@ -127,13 +129,16 @@ export default function Profile() {
                 label="Main Balance"
                 value={`${wallet.displayBalance < 0 ? '-' : ''}${fmt(wallet.displayBalance)}`}
                 valueColor={wallet.displayBalance < 0 ? colors.errorColor : colors.successColor}
+                last={!config.featureFlags.walletRecharge}
               />
-              <Button
-                label="Recharge Wallet"
-                icon="recharge"
-                onPress={() => router.push('/wallet/recharge')}
-                style={{ marginTop: spacing.md, backgroundColor: colors.accent }}
-              />
+              {config.featureFlags.walletRecharge && (
+                <Button
+                  label="Recharge Wallet"
+                  icon="recharge"
+                  onPress={() => router.push('/wallet/recharge')}
+                  style={{ marginTop: spacing.md, backgroundColor: colors.accent }}
+                />
+              )}
             </Card>
             <ThemedText variant="muted" style={{ marginTop: spacing.sm }}>
               Your OD Limit is {fmt(wallet.permanentOdLimit)}

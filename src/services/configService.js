@@ -7,16 +7,26 @@ const STORAGE_KEY = 'app_config'
 // should fall back to their local require()'d logo when these are unset.
 const DEFAULT_CONFIG = {
   apiBaseUrl: null,
+  appName: null,
+  appIconUrl: null,
   branding: {
     logoUrl: null,
     loadingLogoUrl: null,
     primaryColor: null,
     backgroundColor: null,
   },
-  minSupportedVersion: '1.0.0',
+  minSupportedVersion: null,
   forceUpdate: false,
   maintenanceMode: false,
-  featureFlags: {},
+  // Fail open: if /app-config was never fetched (offline first launch, backend down), these
+  // default to "on" so a network hiccup can't silently disable OTP login, wallet recharge, or
+  // push registration for everyone — the same reasoning as forceUpdate/maintenanceMode defaulting
+  // to false rather than blocking the app.
+  featureFlags: {
+    otpLogin: true,
+    pushNotifications: true,
+    walletRecharge: true,
+  },
 }
 
 let config = DEFAULT_CONFIG

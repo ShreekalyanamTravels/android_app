@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Icon from '../../src/components/Icon'
 import { colors, fonts, radius, spacing } from '../../src/theme/tokens'
 import { registerForPushNotifications, subscribeToPushTokenChanges } from '../../src/services/pushService'
+import { useAppConfig } from '../../src/context/ConfigContext'
 
 const NAV_ITEMS = [
   { key: 'bookings', label: 'Bookings', icon: 'briefcase', route: 'bookings' },
@@ -43,11 +44,15 @@ function CustomTabBar({ state, navigation }) {
 }
 
 export default function TabsLayout() {
+  const config = useAppConfig()
+  const pushEnabled = config.featureFlags.pushNotifications
+
   useEffect(() => {
+    if (!pushEnabled) return
     registerForPushNotifications()
     const sub = subscribeToPushTokenChanges()
     return () => sub.remove()
-  }, [])
+  }, [pushEnabled])
 
   return (
     <Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
