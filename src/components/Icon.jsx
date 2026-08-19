@@ -15,6 +15,7 @@ const MAP = {
   'chevron-down': ['ion', 'chevron-down'],
   history: ['ion', 'time-outline'],
   wallet: ['ion', 'wallet-outline'],
+  recharge: ['mci', 'wallet-plus-outline'],
   qrcode: ['mci', 'qrcode'],
   'building-bank': ['mci', 'bank-outline'],
   'credit-card': ['ion', 'card-outline'],

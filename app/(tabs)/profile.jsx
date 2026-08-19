@@ -9,6 +9,7 @@ import Card from '../../src/components/Card'
 import Preloader from '../../src/components/Preloader'
 import Icon from '../../src/components/Icon'
 import AppDrawer from '../../src/components/AppDrawer'
+import ConfirmModal from '../../src/components/ConfirmModal'
 import { getCurrentUser } from '../../src/services/profileService'
 import { logout } from '../../src/services/authService'
 import { getWalletBalance } from '../../src/services/walletService'
@@ -32,6 +33,7 @@ export default function Profile() {
   const [error, setError] = useState('')
   const [wallet, setWallet] = useState(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [confirmLogoutVisible, setConfirmLogoutVisible] = useState(false)
 
   const loadData = useCallback(async () => {
     await Promise.all([
@@ -43,10 +45,27 @@ export default function Profile() {
 
   useEffect(() => { loadData() }, [loadData])
 
-  async function handleLogout() {
+  function handleLogout() {
+    setConfirmLogoutVisible(true)
+  }
+
+  async function doLogout() {
+    setConfirmLogoutVisible(false)
     await logout()
     router.replace('/(auth)/login')
   }
+
+  const logoutConfirm = (
+    <ConfirmModal
+      visible={confirmLogoutVisible}
+      title="Log Out"
+      message="Are you sure you want to log out?"
+      confirmLabel="Log Out"
+      destructive
+      onConfirm={doLogout}
+      onCancel={() => setConfirmLogoutVisible(false)}
+    />
+  )
 
   if (error) {
     return (
@@ -55,6 +74,7 @@ export default function Profile() {
           <ThemedText variant="muted">{error}</ThemedText>
           <Button label="Log Out" variant="ghost" onPress={handleLogout} style={{ marginTop: spacing.lg }} />
         </View>
+        {logoutConfirm}
       </SafeAreaView>
     )
   }
@@ -107,18 +127,18 @@ export default function Profile() {
                 label="Main Balance"
                 value={`${wallet.displayBalance < 0 ? '-' : ''}${fmt(wallet.displayBalance)}`}
                 valueColor={wallet.displayBalance < 0 ? colors.errorColor : colors.successColor}
-                last
+              />
+              <Button
+                label="Recharge Wallet"
+                icon="recharge"
+                onPress={() => router.push('/wallet/recharge')}
+                style={{ marginTop: spacing.md, backgroundColor: colors.accent }}
               />
             </Card>
             <ThemedText variant="muted" style={{ marginTop: spacing.sm }}>
               Your OD Limit is {fmt(wallet.permanentOdLimit)}
               {wallet.tempOdValid && wallet.tempOdBal > 0 ? ` · Temporary OD: ${fmt(wallet.tempOdBal)} (valid till ${wallet.tempOdExpiry})` : ''}
             </ThemedText>
-            <Button
-              label="Recharge Wallet"
-              onPress={() => router.push('/wallet/recharge')}
-              style={{ marginTop: spacing.md, backgroundColor: colors.accent }}
-            />
           </>
         )}
 
@@ -150,6 +170,7 @@ export default function Profile() {
       </ScrollView>
 
       <AppDrawer visible={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      {logoutConfirm}
     </SafeAreaView>
   )
 }

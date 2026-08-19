@@ -1,9 +1,10 @@
 import { Pressable, ActivityIndicator, StyleSheet } from 'react-native'
 import ThemedText from './ThemedText'
+import Icon from './Icon'
 import { colors, radius, spacing } from '../theme/tokens'
 
 // variant: 'primary' | 'ghost'
-export default function Button({ label, onPress, variant = 'primary', disabled = false, loading = false, style }) {
+export default function Button({ label, icon, onPress, variant = 'primary', disabled = false, loading = false, style }) {
   const isPrimary = variant === 'primary'
   const textColor = isPrimary ? colors.white : colors.gold
   return (
@@ -19,6 +20,7 @@ export default function Button({ label, onPress, variant = 'primary', disabled =
       ]}
     >
       {loading && <ActivityIndicator size="small" color={textColor} style={{ marginRight: spacing.sm }} />}
+      {icon && !loading && <Icon name={icon} size={16} color={textColor} style={{ marginRight: spacing.sm }} />}
       <ThemedText variant="bodyMedium" style={{ color: textColor, fontSize: 14 }}>
         {label}
       </ThemedText>
