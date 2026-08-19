@@ -2,17 +2,28 @@ import { useEffect, useCallback, useState } from 'react'
 import { Stack } from 'expo-router'
 import './global.css'
 import { StatusBar } from 'expo-status-bar'
-import { View, Image, ActivityIndicator, StyleSheet } from 'react-native'
+import { View, ActivityIndicator, StyleSheet } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import * as SplashScreen from 'expo-splash-screen'
 import { useFonts, CormorantGaramond_600SemiBold, CormorantGaramond_700Bold } from '@expo-google-fonts/cormorant-garamond'
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter'
 import { restoreSession } from '../src/services/authService'
 import { colors, spacing } from '../src/theme/tokens'
+import { ConfigProvider, useAppConfig } from '../src/context/ConfigContext'
+import BrandLogo from '../src/components/BrandLogo'
 
 SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
+  return (
+    <ConfigProvider>
+      <AppShell />
+    </ConfigProvider>
+  )
+}
+
+function AppShell() {
+  const config = useAppConfig()
   const [fontsLoaded] = useFonts({
     CormorantGaramond_600SemiBold,
     CormorantGaramond_700Bold,
@@ -46,9 +57,9 @@ export default function RootLayout() {
   // user and a blank white page.
   if (!fontsLoaded || !sessionLoaded) {
     return (
-      <View style={styles.boot}>
-        <Image source={require('../assets/logo.png')} style={styles.bootLogo} resizeMode="contain" />
-        <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.xl }} />
+      <View style={[styles.boot, config.branding.backgroundColor && { backgroundColor: config.branding.backgroundColor }]}>
+        <BrandLogo uri={config.branding.loadingLogoUrl} style={styles.bootLogo} />
+        <ActivityIndicator color={config.branding.primaryColor || colors.primary} style={{ marginTop: spacing.xl }} />
       </View>
     )
   }

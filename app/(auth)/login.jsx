@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Image, ActivityIndicator } from 'react-native'
+import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
 import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Icon from '../../src/components/Icon'
 import Toast from '../../src/components/Toast'
+import BrandLogo from '../../src/components/BrandLogo'
 import { login, sendLoginOtp, verifyLoginOtp } from '../../src/services/authService'
 import { colors, spacing, radius, fonts } from '../../src/theme/tokens'
+import { useAppConfig } from '../../src/context/ConfigContext'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const MOBILE_RE = /^[6-9]\d{9}$/
@@ -21,6 +23,7 @@ function validate(email, password) {
 
 export default function Login() {
   const router = useRouter()
+  const config = useAppConfig()
   const [loginMethod, setLoginMethod] = useState('email') // 'email' | 'mobile'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -143,7 +146,7 @@ export default function Login() {
         </View>
 
         <View style={styles.content}>
-          <Image source={require('../../assets/logo.png')} style={styles.logo} resizeMode="contain" />
+          <BrandLogo uri={config.branding.logoUrl} style={styles.logo} />
           <Text style={styles.tagline}>Premium travel, curated for you</Text>
           <Text style={styles.title}>Corporate login</Text>
           <Text style={styles.subtitle}>Access your corporate travel dashboard</Text>

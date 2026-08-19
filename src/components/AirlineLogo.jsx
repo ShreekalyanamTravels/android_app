@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { View, Text, Image, StyleSheet } from 'react-native'
-import { SERVER_ORIGIN } from '../services/apiClient'
+import { getServerOrigin } from '../services/apiClient'
 
 // Mirrors the web app's AirlineLogo — /airline_icons/{code}.png served from the backend, falling
 // back to a colored circle with the airline code when the image 404s (not every carrier has an
@@ -18,7 +18,7 @@ export default function AirlineLogo({ code, color = '#555555', size = 38, radius
 
   return (
     <Image
-      source={{ uri: `${SERVER_ORIGIN}/airline_icons/${code}.png` }}
+      source={{ uri: `${getServerOrigin()}/airline_icons/${code}.png` }}
       onError={() => setFailed(true)}
       style={[styles.logo, { width: size, height: size, borderRadius: radius }, style]}
       resizeMode="contain"
