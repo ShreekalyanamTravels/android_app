@@ -175,6 +175,7 @@ export default function Search() {
           children: String(travellers.children),
           infants: String(travellers.infants),
           cabinClass,
+          directOnly: directFlight ? '1' : '',
         },
       })
       return
@@ -192,6 +193,7 @@ export default function Search() {
         children: String(travellers.children),
         infants: String(travellers.infants),
         cabinClass,
+        directOnly: directFlight ? '1' : '',
       },
     })
   }

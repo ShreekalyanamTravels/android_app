@@ -65,7 +65,7 @@ function LegCard({ label, leg, flight, active, onPress, compact }) {
 export default function Results() {
   const router = useRouter()
   const params = useLocalSearchParams()
-  const { tripType = 'oneway', from = 'DEL', to = 'BOM', date = '', returnDate = '', adults = '1', children = '0', infants = '0', cabinClass = 'Economy' } = params
+  const { tripType = 'oneway', from = 'DEL', to = 'BOM', date = '', returnDate = '', adults = '1', children = '0', infants = '0', cabinClass = 'Economy', directOnly = '' } = params
   const adultsCount = parseInt(adults, 10) || 0
   const childrenCount = parseInt(children, 10) || 0
   const infantsCount = parseInt(infants, 10) || 0
@@ -94,7 +94,7 @@ export default function Results() {
   const [creating, setCreating] = useState(false)
   const [fareSheetFlight, setFareSheetFlight] = useState(null)
   const [filterModalOpen, setFilterModalOpen] = useState(false)
-  const [filterStops, setFilterStops] = useState([])
+  const [filterStops, setFilterStops] = useState(() => directOnly ? ['nonstop'] : [])
   const [filterTime, setFilterTime] = useState([])
   const [filterAir, setFilterAir] = useState([])
   const [priceMax, setPriceMax] = useState(null)
