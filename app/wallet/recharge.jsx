@@ -8,6 +8,7 @@ import { getCurrentUser } from '../../src/services/authService'
 import {
   getConvenienceFee, getGstPercentage, createRechargeOrder, verifyRechargePayment,
 } from '../../src/services/walletService'
+import { getRazorpayConfig } from '../../src/services/paymentConfigService'
 import { colors, spacing, radius, fonts } from '../../src/theme/tokens'
 import { useAppConfig } from '../../src/context/ConfigContext'
 
@@ -52,16 +53,20 @@ export default function RechargeWallet() {
   const [payStatus, setPayStatus] = useState('idle') // idle | creating | success
   const [error, setError] = useState('')
   const [scriptReady, setScriptReady] = useState(false)
+  // enabled defaults true (fail open) so a slow/failed config fetch never blocks a payment that
+  // would otherwise work — same reasoning as the app-config feature flags.
+  const [rzConfig, setRzConfig] = useState({ enabled: true, currency: 'INR', themeColor: null })
 
   const numAmount = parseFloat(amount) || 0
   const activeMethod = METHODS.find(m => m.key === method)
   const gst = numAmount > 0 ? Math.round((convenience * gstPercentage) / 100) : 0
   const total = numAmount + convenience + gst
   const amountValid = numAmount >= 100
-  const canPay = amountValid && (Platform.OS !== 'web' || scriptReady) && payStatus !== 'creating'
+  const canPay = amountValid && rzConfig.enabled && (Platform.OS !== 'web' || scriptReady) && payStatus !== 'creating'
 
   useEffect(() => {
     getGstPercentage().then(setGstPercentage).catch(() => setGstPercentage(0))
+    getRazorpayConfig().then(setRzConfig).catch(() => {})
     if (Platform.OS === 'web') loadRazorpayScript().then(setScriptReady)
   }, [])
 
@@ -89,7 +94,7 @@ export default function RechargeWallet() {
           description: 'Wallet Top-up',
           order_id: order.orderId,
           prefill: { name: user?.name, email: user?.email },
-          theme: { color: ACCENT },
+          theme: { color: rzConfig.themeColor || ACCENT },
           config: {
             display: {
               blocks: { highlighted: CHECKOUT_BLOCK[method] },
@@ -125,7 +130,7 @@ export default function RechargeWallet() {
     }
   }
 
-  if (config.featureFlags.walletRecharge === false) {
+  if (config.featureFlags.walletRecharge === false || rzConfig.enabled === false) {
     return (
       <View style={[styles.container, { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xl }]}>
         <ThemedText variant="h3" style={{ textAlign: 'center' }}>Wallet Recharge Unavailable</ThemedText>

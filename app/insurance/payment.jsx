@@ -6,6 +6,7 @@ import Icon from '../../src/components/Icon'
 import { colors, spacing, radius, fonts } from '../../src/theme/tokens'
 import { getWalletBalance } from '../../src/services/walletService'
 import { purchaseInsurance, createInsuranceRazorpayOrder, verifyInsuranceRazorpayPayment } from '../../src/services/insuranceApi'
+import { getRazorpayConfig } from '../../src/services/paymentConfigService'
 import { useAppConfig } from '../../src/context/ConfigContext'
 
 const METHODS = [
@@ -53,9 +54,11 @@ export default function InsurancePayment() {
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState('')
   const [scriptReady, setScriptReady] = useState(false)
+  const [rzConfig, setRzConfig] = useState({ enabled: true, currency: 'INR', themeColor: null })
 
   useEffect(() => {
     getWalletBalance().then(setWallet).catch(() => {})
+    getRazorpayConfig().then(setRzConfig).catch(() => {})
     if (Platform.OS === 'web') loadRazorpayScript().then(setScriptReady)
   }, [])
 
@@ -135,7 +138,7 @@ export default function InsurancePayment() {
           description: 'Travel Insurance Premium',
           order_id: order.orderId,
           prefill: { email: proposer?.email, contact: proposer?.mobile },
-          theme: { color: colors.primary },
+          theme: { color: rzConfig.themeColor || colors.primary },
           config: {
             display: {
               blocks: { highlighted: CHECKOUT_BLOCK[method] },
@@ -206,7 +209,7 @@ export default function InsurancePayment() {
 
         {METHODS.map(m => {
           const selected = method === m.id
-          const disabled = m.id === 'creditpool' && creditPoolInsufficient
+          const disabled = (m.id === 'creditpool' && creditPoolInsufficient) || (m.id !== 'creditpool' && rzConfig.enabled === false)
           return (
             <Pressable key={m.id} style={[styles.methodCard, selected && styles.methodCardSelected, disabled && { opacity: 0.5 }]} onPress={() => !disabled && setMethod(m.id)} disabled={disabled}>
               <View style={styles.methodRow}>

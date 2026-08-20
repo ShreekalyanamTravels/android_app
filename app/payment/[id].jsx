@@ -8,6 +8,7 @@ import Preloader from '../../src/components/Preloader'
 import { getDraft } from '../../src/services/flightBookingFlow'
 import { getWalletBalance, getConvenienceFee } from '../../src/services/walletService'
 import { getFlightPrice, createFlightBooking, createFlightRazorpayOrder, verifyFlightRazorpayPayment } from '../../src/services/bookingApi'
+import { getRazorpayConfig } from '../../src/services/paymentConfigService'
 import { TRIP_TYPE_CODE } from '../../src/services/flightsService'
 import { colors, spacing, radius, fonts } from '../../src/theme/tokens'
 import { useAppConfig } from '../../src/context/ConfigContext'
@@ -55,10 +56,12 @@ export default function Payment() {
   const [livePriceStatus, setLivePriceStatus] = useState('checking')
   const [flightsData, setFlightsData] = useState(null)
   const [priceRetryTick, setPriceRetryTick] = useState(0)
+  const [rzConfig, setRzConfig] = useState({ enabled: true, currency: 'INR', themeColor: null })
 
   useEffect(() => {
     getDraft(id).then(setDraft)
     getWalletBalance().then(setWallet).catch(() => {})
+    getRazorpayConfig().then(setRzConfig).catch(() => {})
     if (Platform.OS === 'web') loadRazorpayScript().then(setScriptReady)
   }, [id])
 
@@ -156,7 +159,7 @@ export default function Payment() {
           description: 'Flight Booking Payment',
           order_id: order.orderId,
           prefill: { name: leadName, email: draft.contact.email, contact: draft.contact.mobile },
-          theme: { color: colors.primary },
+          theme: { color: rzConfig.themeColor || colors.primary },
           config: {
             display: {
               blocks: { highlighted: CHECKOUT_BLOCK[method] },
@@ -252,7 +255,7 @@ export default function Payment() {
 
         {METHODS.map(m => {
           const selected = method === m.id
-          const disabled = m.id === 'creditpool' && creditPoolInsufficient
+          const disabled = (m.id === 'creditpool' && creditPoolInsufficient) || (m.id !== 'creditpool' && rzConfig.enabled === false)
           return (
             <Pressable key={m.id} style={[styles.methodCard, selected && styles.methodCardSelected, disabled && { opacity: 0.5 }]} onPress={() => !disabled && setMethod(m.id)} disabled={disabled}>
               <View style={styles.methodRow}>
