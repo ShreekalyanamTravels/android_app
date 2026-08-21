@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Platform, Alert } from 'react-native'
+import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Platform } from 'react-native'
 import { useRouter } from 'expo-router'
+import RazorpayCheckout from 'react-native-razorpay'
 import ThemedText from '../../src/components/ThemedText'
 import Button from '../../src/components/Button'
 import Card from '../../src/components/Card'
@@ -124,8 +125,37 @@ export default function RechargeWallet() {
         rzp.open()
         setPayStatus('idle')
       } else {
-        Alert.alert('Not available', 'Online payment isn’t available in this app build yet. Please use the web app to recharge.')
-        setPayStatus('idle')
+        let payment
+        try {
+          payment = await RazorpayCheckout.open({
+            key: order.keyId,
+            amount: Math.round(order.total * 100),
+            currency: 'INR',
+            name: config.appName || 'Shree Kalyanam',
+            image: rzConfig.logo || undefined,
+            description: 'Wallet Top-up',
+            order_id: order.orderId,
+            prefill: { name: user?.name, email: user?.email },
+            theme: { color: rzConfig.themeColor || ACCENT },
+          })
+        } catch {
+          // User cancelled the checkout, or the gateway itself declined the payment — not a bug,
+          // just no successful payment to verify. Matches the web modal's ondismiss behavior.
+          setPayStatus('idle')
+          return
+        }
+        setPayStatus('creating')
+        try {
+          await verifyRechargePayment({
+            razorpay_order_id: payment.razorpay_order_id,
+            razorpay_payment_id: payment.razorpay_payment_id,
+            razorpay_signature: payment.razorpay_signature,
+          })
+          setPayStatus('success')
+        } catch (e) {
+          setError(e.message || 'Payment succeeded but verification failed. Please contact support.')
+          setPayStatus('idle')
+        }
       }
     } catch (e) {
       setError(e.message || 'Something went wrong. Please try again.')

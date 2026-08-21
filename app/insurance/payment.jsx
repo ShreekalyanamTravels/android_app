@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { View, Text, Pressable, StyleSheet, ScrollView, Platform, Alert } from 'react-native'
+import { View, Text, Pressable, StyleSheet, ScrollView, Platform } from 'react-native'
 import { useRouter, useLocalSearchParams } from 'expo-router'
+import RazorpayCheckout from 'react-native-razorpay'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Icon from '../../src/components/Icon'
 import { colors, spacing, radius, fonts } from '../../src/theme/tokens'
@@ -170,8 +171,37 @@ export default function InsurancePayment() {
         rzp.open()
         setPaying(false)
       } else {
-        Alert.alert('Not available', 'Online payment isn’t available in this app build yet. Please use Credit Pool or the web app.')
-        setPaying(false)
+        let payment
+        try {
+          payment = await RazorpayCheckout.open({
+            key: order.keyId,
+            amount: Math.round(order.amount * 100),
+            currency: 'INR',
+            name: appConfig.appName || 'Shree Kalyanam',
+            image: rzConfig.logo || undefined,
+            description: 'Travel Insurance Premium',
+            order_id: order.orderId,
+            prefill: { email: proposer?.email, contact: proposer?.mobile },
+            theme: { color: rzConfig.themeColor || colors.primary },
+          })
+        } catch {
+          setPaying(false)
+          return
+        }
+        setPaying(true)
+        try {
+          const verify = await verifyInsuranceRazorpayPayment({
+            razorpay_order_id: payment.razorpay_order_id,
+            razorpay_payment_id: payment.razorpay_payment_id,
+            razorpay_signature: payment.razorpay_signature,
+            mode: method,
+            ...buildPurchasePayload(),
+          })
+          goToConfirmation(verify.ref, verify.policyNumber)
+        } catch (e) {
+          setError(e.message || 'Payment succeeded but policy issuance failed. Please contact support.')
+          setPaying(false)
+        }
       }
     } catch (e) {
       setError(e.message || 'Something went wrong. Please try again.')

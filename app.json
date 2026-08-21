@@ -10,7 +10,10 @@
     "backgroundColor": "#faf8f4",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.shreekalyanam.travel"
+      "bundleIdentifier": "com.shreekalyanam.travel",
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": ["tez", "phonepe", "paytmmp", "credpay"]
+      }
     },
     "android": {
       "package": "com.shreekalyanam.travel",
