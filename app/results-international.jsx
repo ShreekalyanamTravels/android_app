@@ -213,7 +213,7 @@ export default function ResultsInternational() {
   const toneColor = tone === 'pink' ? PINK : ORANGE
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.header}>
         <View style={styles.headerRow}>
           <Pressable onPress={() => router.back()} hitSlop={10}>
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
   refundBadgeTextYes: { color: colors.success.fg },
   refundBadgeTextNo: { color: colors.error.fg },
 
-  footer: { backgroundColor: '#7a3010', paddingHorizontal: spacing.lg, paddingVertical: spacing.md, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  footer: { backgroundColor: '#7a3010', paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.md + 6, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   footerLabel: { fontSize: 11, color: 'rgba(255,255,255,0.75)' },
   footerPrice: { fontSize: 17, fontWeight: '600', color: colors.white },
   bookBtn: { backgroundColor: ORANGE, paddingHorizontal: 22, paddingVertical: 10, borderRadius: radius.pill },
