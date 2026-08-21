@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import Icon from '../../src/components/Icon'
 import Toast from '../../src/components/Toast'
 import BrandLogo from '../../src/components/BrandLogo'
+import OtpInput from '../../src/components/OtpInput'
 import { login, sendLoginOtp, verifyLoginOtp } from '../../src/services/authService'
 import { colors, spacing, radius, fonts } from '../../src/theme/tokens'
 import { useAppConfig } from '../../src/context/ConfigContext'
@@ -240,19 +241,9 @@ export default function Login() {
               </View>
 
               {otpSent && (
-                <View style={styles.field}>
-                  <Icon name="lock" size={17} color={colors.primary} />
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.fieldLabel}>ENTER OTP</Text>
-                    <TextInput
-                      value={otp}
-                      onChangeText={setOtp}
-                      style={styles.fieldInput}
-                      keyboardType="number-pad"
-                      maxLength={6}
-                      placeholderTextColor={colors.textMuted}
-                    />
-                  </View>
+                <View style={{ marginBottom: 14 }}>
+                  <Text style={[styles.fieldLabel, { marginBottom: 8 }]}>ENTER OTP</Text>
+                  <OtpInput value={otp} onChangeText={setOtp} autoFocus />
                 </View>
               )}
 
