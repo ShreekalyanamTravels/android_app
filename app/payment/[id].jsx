@@ -11,7 +11,7 @@ import { getFlightPrice, createFlightBooking, createFlightRazorpayOrder, verifyF
 import { getRazorpayConfig } from '../../src/services/paymentConfigService'
 import { TRIP_TYPE_CODE } from '../../src/services/flightsService'
 import { colors, spacing, radius, fonts } from '../../src/theme/tokens'
-import { useAppConfig } from '../../src/context/ConfigContext'
+import { useAppConfig, useRefreshConfig } from '../../src/context/ConfigContext'
 
 const METHODS = [
   { id: 'creditpool', label: 'Credit Pool', icon: 'wallet', iconBg: colors.pinkBg, iconColor: colors.primary },
@@ -42,6 +42,7 @@ function loadRazorpayScript() {
 export default function Payment() {
   const router = useRouter()
   const config = useAppConfig()
+  const refreshConfig = useRefreshConfig()
   const { id } = useLocalSearchParams()
   const [draft, setDraft] = useState(null)
   const [wallet, setWallet] = useState(null)
@@ -62,6 +63,7 @@ export default function Payment() {
     getDraft(id).then(setDraft)
     getWalletBalance().then(setWallet).catch(() => {})
     getRazorpayConfig().then(setRzConfig).catch(() => {})
+    refreshConfig().catch(() => {})
     if (Platform.OS === 'web') loadRazorpayScript().then(setScriptReady)
   }, [id])
 
@@ -156,6 +158,7 @@ export default function Payment() {
           amount: Math.round(order.amount * 100),
           currency: 'INR',
           name: config.appName || 'Shree Kalyanam',
+          image: config.branding.logoUrl || undefined,
           description: 'Flight Booking Payment',
           order_id: order.orderId,
           prefill: { name: leadName, email: draft.contact.email, contact: draft.contact.mobile },

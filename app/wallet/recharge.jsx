@@ -10,7 +10,7 @@ import {
 } from '../../src/services/walletService'
 import { getRazorpayConfig } from '../../src/services/paymentConfigService'
 import { colors, spacing, radius, fonts } from '../../src/theme/tokens'
-import { useAppConfig } from '../../src/context/ConfigContext'
+import { useAppConfig, useRefreshConfig } from '../../src/context/ConfigContext'
 
 const ACCENT = colors.accent // matches the web recharge page's orange theme
 
@@ -45,6 +45,7 @@ function loadRazorpayScript() {
 export default function RechargeWallet() {
   const router = useRouter()
   const config = useAppConfig()
+  const refreshConfig = useRefreshConfig()
   const user = getCurrentUser()
   const [amount, setAmount] = useState('')
   const [method, setMethod] = useState('upi')
@@ -67,6 +68,7 @@ export default function RechargeWallet() {
   useEffect(() => {
     getGstPercentage().then(setGstPercentage).catch(() => setGstPercentage(0))
     getRazorpayConfig().then(setRzConfig).catch(() => {})
+    refreshConfig().catch(() => {})
     if (Platform.OS === 'web') loadRazorpayScript().then(setScriptReady)
   }, [])
 
@@ -91,6 +93,7 @@ export default function RechargeWallet() {
           amount: Math.round(order.total * 100),
           currency: 'INR',
           name: config.appName || 'Shree Kalyanam',
+          image: config.branding.logoUrl || undefined,
           description: 'Wallet Top-up',
           order_id: order.orderId,
           prefill: { name: user?.name, email: user?.email },
