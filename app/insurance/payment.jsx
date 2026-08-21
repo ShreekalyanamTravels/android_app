@@ -186,7 +186,7 @@ export default function InsurancePayment() {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.hero}>
         <View style={styles.heroRow}>
           <Pressable onPress={() => router.back()} hitSlop={10}>
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
 
   errorText: { fontSize: 12, color: colors.errorColor, marginTop: 4, textAlign: 'center' },
 
-  footer: { backgroundColor: colors.primaryDark, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, paddingBottom: spacing.lg },
+  footer: { backgroundColor: colors.primaryDark, paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.md + spacing.sm },
   footerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   footerLabel: { fontSize: 11, color: colors.onDarkMuted },
   footerPrice: { fontSize: 18, fontWeight: '700', color: colors.onDark },

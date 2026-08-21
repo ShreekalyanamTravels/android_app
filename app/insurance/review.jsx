@@ -77,7 +77,7 @@ export default function ReviewPolicy() {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.hero}>
         <View style={styles.heroRow}>
           <Pressable onPress={() => router.back()} hitSlop={10}>
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   checkboxChecked: { backgroundColor: colors.primary, borderColor: colors.primary },
   agreeText: { flex: 1, fontSize: 12.5, color: colors.textMuted, lineHeight: 18 },
 
-  bottomBar: { position: 'absolute', left: 0, right: 0, bottom: 0, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.border, paddingHorizontal: spacing.lg, paddingVertical: 14, paddingBottom: spacing.xl },
+  bottomBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.border, paddingHorizontal: spacing.lg, paddingTop: 14, paddingBottom: 14 + spacing.sm },
   bottomPremium: { fontSize: 19, fontWeight: '800', color: colors.primaryDark },
   bottomNetFare: { fontSize: 11.5, color: colors.textFaint, marginTop: 2 },
   buyBtn: { backgroundColor: colors.primary, borderRadius: radius.pill, paddingHorizontal: 32, paddingVertical: 13 },

@@ -202,7 +202,7 @@ export default function PassengerDetails() {
   const totalPayable = fare?.totalPayableAmt ?? 0
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <WizardHeader title="Passenger details" subtitle="Step 3 of 6" step={3} />
 
       <Pressable style={styles.summaryStrip} onPress={() => setSectorOpen(v => !v)}>
@@ -650,7 +650,7 @@ const styles = StyleSheet.create({
   gstSavedBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.success.bg, borderRadius: radius.md, paddingHorizontal: 12, paddingVertical: 7 },
   gstSavedText: { fontSize: 11.5, fontWeight: '600', color: colors.successColor },
 
-  footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.border, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  footer: { backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.border, paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.md + spacing.sm, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   footerFareBox: {},
   footerCount: { fontSize: 11, color: colors.textMuted },
   footerFareRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },

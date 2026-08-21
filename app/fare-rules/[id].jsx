@@ -28,7 +28,7 @@ export default function FareRules() {
   const totalPayable = draft.fare?.totalPayableAmt ?? 0
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.header}>
         <View style={styles.spacer} />
         <Text style={styles.headerTitle}>Baggage and Fare Rules</Text>
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
 
   disclaimer: { fontSize: 11, color: colors.textFaint, marginTop: 10, lineHeight: 16 },
 
-  footer: { backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.border, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  footer: { backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.border, paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.md + spacing.sm, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   footerFareRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   footerPrice: { fontSize: 16, fontWeight: '700', color: colors.textDark },
   footerNetPay: { fontSize: 11, color: colors.textMuted, marginTop: 2 },

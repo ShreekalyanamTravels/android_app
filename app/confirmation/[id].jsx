@@ -41,7 +41,7 @@ export default function Confirmation() {
 
   if (error) {
     return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.center}>
           <Icon name="alert-triangle" size={26} color={colors.textFaint} />
           <Text style={styles.errorText}>{error}</Text>

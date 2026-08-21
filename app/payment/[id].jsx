@@ -215,7 +215,7 @@ export default function Payment() {
   const canPay = livePriceStatus === 'ready' && !paying && (method === 'creditpool' || Platform.OS !== 'web' || scriptReady) && !(method === 'creditpool' && creditPoolInsufficient)
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <WizardHeader
         title="Payment"
         subtitle="Step 5 of 6"
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
 
   errorText: { fontSize: 12, color: colors.errorColor, marginTop: 4, textAlign: 'center' },
 
-  footer: { backgroundColor: colors.primaryDark, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
+  footer: { backgroundColor: colors.primaryDark, paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.md + spacing.sm },
   footerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   footerLabel: { fontSize: 11, color: colors.onDarkMuted },
   footerPrice: { fontSize: 17, fontWeight: '500', color: colors.onDark },

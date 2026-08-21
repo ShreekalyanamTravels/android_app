@@ -23,7 +23,7 @@ export default function ReviewBooking() {
   const totalPayable = draft.fare?.totalPayableAmt ?? 0
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <WizardHeader title="Review booking" subtitle="Step 4 of 6" step={4} />
 
       <ScrollView contentContainerStyle={{ padding: spacing.lg, paddingBottom: spacing.xxl }}>
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   gstCompany: { fontSize: 12, color: colors.textBody, marginTop: 6 },
   gstLine: { fontSize: 11, color: colors.textMuted, marginTop: 2 },
 
-  footer: { backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.border, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, flexDirection: 'row', gap: 8, alignItems: 'center' },
+  footer: { backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.border, paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.md + spacing.sm, flexDirection: 'row', gap: 8, alignItems: 'center' },
   payBtn: { flex: 1, flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary, paddingVertical: 10, borderRadius: radius.pill },
   payBtnText: { fontSize: 13, fontWeight: '500', color: colors.onDark },
 })
