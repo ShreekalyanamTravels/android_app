@@ -56,7 +56,7 @@ export default function RechargeWallet() {
   const [scriptReady, setScriptReady] = useState(false)
   // enabled defaults true (fail open) so a slow/failed config fetch never blocks a payment that
   // would otherwise work — same reasoning as the app-config feature flags.
-  const [rzConfig, setRzConfig] = useState({ enabled: true, currency: 'INR', themeColor: null })
+  const [rzConfig, setRzConfig] = useState({ enabled: true, currency: 'INR', themeColor: null, logo: null })
 
   const numAmount = parseFloat(amount) || 0
   const activeMethod = METHODS.find(m => m.key === method)
@@ -93,7 +93,7 @@ export default function RechargeWallet() {
           amount: Math.round(order.total * 100),
           currency: 'INR',
           name: config.appName || 'Shree Kalyanam',
-          image: config.branding.logoUrl || undefined,
+          image: rzConfig.logo || undefined,
           description: 'Wallet Top-up',
           order_id: order.orderId,
           prefill: { name: user?.name, email: user?.email },

@@ -55,7 +55,7 @@ export default function InsurancePayment() {
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState('')
   const [scriptReady, setScriptReady] = useState(false)
-  const [rzConfig, setRzConfig] = useState({ enabled: true, currency: 'INR', themeColor: null })
+  const [rzConfig, setRzConfig] = useState({ enabled: true, currency: 'INR', themeColor: null, logo: null })
 
   useEffect(() => {
     getWalletBalance().then(setWallet).catch(() => {})
@@ -137,7 +137,7 @@ export default function InsurancePayment() {
           amount: Math.round(order.amount * 100),
           currency: 'INR',
           name: appConfig.appName || 'Shree Kalyanam',
-          image: appConfig.branding.logoUrl || undefined,
+          image: rzConfig.logo || undefined,
           description: 'Travel Insurance Premium',
           order_id: order.orderId,
           prefill: { email: proposer?.email, contact: proposer?.mobile },

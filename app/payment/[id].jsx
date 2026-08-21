@@ -57,7 +57,7 @@ export default function Payment() {
   const [livePriceStatus, setLivePriceStatus] = useState('checking')
   const [flightsData, setFlightsData] = useState(null)
   const [priceRetryTick, setPriceRetryTick] = useState(0)
-  const [rzConfig, setRzConfig] = useState({ enabled: true, currency: 'INR', themeColor: null })
+  const [rzConfig, setRzConfig] = useState({ enabled: true, currency: 'INR', themeColor: null, logo: null })
 
   useEffect(() => {
     getDraft(id).then(setDraft)
@@ -158,7 +158,7 @@ export default function Payment() {
           amount: Math.round(order.amount * 100),
           currency: 'INR',
           name: config.appName || 'Shree Kalyanam',
-          image: config.branding.logoUrl || undefined,
+          image: rzConfig.logo || undefined,
           description: 'Flight Booking Payment',
           order_id: order.orderId,
           prefill: { name: leadName, email: draft.contact.email, contact: draft.contact.mobile },
