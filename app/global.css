@@ -4,3 +4,15 @@
 input, textarea, select {
   outline: none !important;
 }
+
+/* Expo's web bootstrap HTML sizes html/body/#root off `height: 100%`, which resolves against a
+   static viewport on mobile browsers — it doesn't shrink when the browser's own bottom toolbar
+   (address bar / tab switcher / gesture menu) is showing. That pushes fixed-to-bottom bars like
+   the results screen's "Book now" footer underneath that toolbar. `100dvh` tracks the browser's
+   actual visible area instead, so bottom content stays clear of it. @supports keeps this a no-op
+   (falls back to the existing 100% behavior) on browsers that don't understand dvh yet. */
+@supports (height: 100dvh) {
+  html, body, #root {
+    height: 100dvh;
+  }
+}
