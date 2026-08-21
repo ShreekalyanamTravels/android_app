@@ -6,6 +6,14 @@ import Icon from '../../src/components/Icon'
 import Preloader from '../../src/components/Preloader'
 import { getBookingByRef } from '../../src/services/bookingApi'
 import { colors, spacing, radius, fonts } from '../../src/theme/tokens'
+import { useAppConfig } from '../../src/context/ConfigContext'
+
+function formatDateTime(value) {
+  if (!value) return '—'
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return String(value)
+  return d.toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' })
+}
 
 const STATUS_LABEL = {
   cancel: 'Cancelled', refund: 'Refunded', hold: 'On Hold', tick: 'Ticketed',
@@ -20,6 +28,7 @@ const PAYMENT_MODE_LABEL = { 1: 'UPI', 2: 'Net Banking', 3: 'Credit Card', 4: 'D
 
 export default function Confirmation() {
   const router = useRouter()
+  const config = useAppConfig()
   const { id: ref } = useLocalSearchParams()
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
@@ -36,7 +45,7 @@ export default function Confirmation() {
         <View style={styles.center}>
           <Icon name="alert-triangle" size={26} color={colors.textFaint} />
           <Text style={styles.errorText}>{error}</Text>
-          <Pressable style={styles.filledBtn} onPress={() => router.replace('/(tabs)/bookings')}>
+          <Pressable style={[styles.filledBtn, { flex: 0, paddingHorizontal: 24 }]} onPress={() => router.replace('/(tabs)/bookings')}>
             <Text style={styles.filledBtnText}>My bookings</Text>
           </Pressable>
         </View>
@@ -86,9 +95,17 @@ export default function Confirmation() {
             <FareRow label="Service fee" value={booking.serviceFee} />
             <FareRow label="Convenience fee" value={booking.convenienceFee} />
             <FareRow label="Total paid" value={booking.totalPayableAmt} bold />
-            <Text style={styles.paymentLine}>
-              Paid via {PAYMENT_MODE_LABEL[booking.paymentMode] || 'Payment'} · {booking.paymentReferenceNo}
-            </Text>
+          </View>
+
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Payment details</Text>
+            <DetailRow label="Billed by" value={config.appName || 'Shree Kalyanam'} />
+            <DetailRow label="Payment reference" value={booking.paymentReferenceNo || '—'} />
+            <DetailRow label="Payment mode" value={PAYMENT_MODE_LABEL[booking.paymentMode] || booking.paymentMode || '—'} />
+            <DetailRow label="Payment status" value={booking.paymentStatus || '—'} />
+            <DetailRow label="Paid on" value={formatDateTime(booking.createdAt)} />
+            {booking.invoiceNo && <DetailRow label="Invoice no." value={booking.invoiceNo} />}
+            <DetailRow label="Amount paid" value={`₹${(booking.totalPayableAmt || 0).toLocaleString('en-IN')}`} bold last />
           </View>
         </View>
       </ScrollView>
@@ -125,6 +142,15 @@ function SectorTicket({ label, sector }) {
         </View>
         <Text style={styles.ticketMeta}>{sector.date}</Text>
       </View>
+    </View>
+  )
+}
+
+function DetailRow({ label, value, bold, last }) {
+  return (
+    <View style={[styles.detailRow, last && { borderBottomWidth: 0 }]}>
+      <Text style={styles.detailRowLabel}>{label}</Text>
+      <Text style={[styles.detailRowValue, bold && { fontWeight: '700', color: colors.textDark }]}>{value}</Text>
     </View>
   )
 }
@@ -177,7 +203,10 @@ const styles = StyleSheet.create({
   fareRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
   fareRowLabel: { fontSize: 12, color: colors.textMuted },
   fareRowValue: { fontSize: 12, color: colors.textDark },
-  paymentLine: { fontSize: 11, color: colors.textFaint, marginTop: 8, borderTopWidth: 1, borderTopColor: colors.divider, paddingTop: 8 },
+
+  detailRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: colors.divider },
+  detailRowLabel: { fontSize: 12, color: colors.textMuted },
+  detailRowValue: { fontSize: 12, color: colors.textBody, maxWidth: '60%', textAlign: 'right' },
 
   footer: { backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.border, padding: 14, flexDirection: 'row', gap: 8 },
   outlineBtn: { flex: 1, borderWidth: 1.5, borderColor: colors.primary, alignItems: 'center', paddingVertical: 10, borderRadius: radius.pill },
