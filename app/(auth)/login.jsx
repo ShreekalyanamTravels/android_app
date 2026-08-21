@@ -242,9 +242,14 @@ export default function Login() {
 
               {otpSent && (
                 <View style={{ marginBottom: 14 }}>
-                  <Text style={styles.otpSentNote}>
-                    A verification code has been sent to +91 {mobile.trim()}
-                  </Text>
+                  <View style={styles.otpSentBanner}>
+                    <View style={styles.otpSentIconWrap}>
+                      <Icon name="check" size={11} color={colors.onDark} />
+                    </View>
+                    <Text style={styles.otpSentText}>
+                      Verification code sent to <Text style={styles.otpSentBold}>+91 {mobile.trim()}</Text>
+                    </Text>
+                  </View>
                   <Text style={[styles.fieldLabel, { marginBottom: 8 }]}>ENTER OTP</Text>
                   <OtpInput value={otp} onChangeText={setOtp} autoFocus />
                 </View>
@@ -301,7 +306,17 @@ const styles = StyleSheet.create({
   methodPillText: { fontSize: 13, fontWeight: '600', color: colors.textMuted },
   methodPillTextActive: { color: colors.onDark },
   changeNumberText: { fontSize: 11, fontWeight: '600', color: colors.primary },
-  otpSentNote: { fontSize: 12, color: colors.successColor, marginBottom: 10 },
+  otpSentBanner: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    backgroundColor: '#EAF7EE', borderWidth: 1, borderColor: '#CFEBD8', borderRadius: radius.md,
+    paddingVertical: 9, paddingHorizontal: 10, marginBottom: 12,
+  },
+  otpSentIconWrap: {
+    width: 18, height: 18, borderRadius: 9, backgroundColor: colors.successColor,
+    alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+  },
+  otpSentText: { flex: 1, fontSize: 12, color: '#2F6B41', lineHeight: 16 },
+  otpSentBold: { fontWeight: '700' },
 
   field: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
