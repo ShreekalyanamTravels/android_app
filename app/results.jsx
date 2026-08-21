@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
   refundBadgeTextYes: { color: colors.success.fg },
   refundBadgeTextNo: { color: colors.error.fg },
 
-  footer: { backgroundColor: colors.primaryDark, paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.md + 6, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  footer: { backgroundColor: colors.primaryDark, paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.xl, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   footerLabel: { fontSize: 11, color: colors.onDarkMuted },
   footerPrice: { fontSize: 17, fontWeight: '500', color: colors.onDark },
   bookBtn: { backgroundColor: colors.accent, paddingHorizontal: 22, paddingVertical: 10, borderRadius: radius.pill },
