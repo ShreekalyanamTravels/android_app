@@ -242,6 +242,9 @@ export default function Login() {
 
               {otpSent && (
                 <View style={{ marginBottom: 14 }}>
+                  <Text style={styles.otpSentNote}>
+                    A verification code has been sent to +91 {mobile.trim()}
+                  </Text>
                   <Text style={[styles.fieldLabel, { marginBottom: 8 }]}>ENTER OTP</Text>
                   <OtpInput value={otp} onChangeText={setOtp} autoFocus />
                 </View>
@@ -298,6 +301,7 @@ const styles = StyleSheet.create({
   methodPillText: { fontSize: 13, fontWeight: '600', color: colors.textMuted },
   methodPillTextActive: { color: colors.onDark },
   changeNumberText: { fontSize: 11, fontWeight: '600', color: colors.primary },
+  otpSentNote: { fontSize: 12, color: colors.successColor, marginBottom: 10 },
 
   field: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
